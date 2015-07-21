@@ -77,6 +77,26 @@ def assign_grade(github, title, grade):
     db_connection.commit()
     print "Successfully added %s's grade of %s for the %s project." %(github, grade, title)
 
+def make_new_project(title, max_grade, description):
+    """Add a new project and print confirmation"""
+    QUERY = """
+        INSERT INTO Projects (title, max_grade, description) VALUES (?,?,?)
+        """
+    db_cursor.execute(QUERY, (title, max_grade, description))
+    db_connection.commit()
+    print "Successfully added new project named %s with a maximum grade of %s and the following description:\n%s" %(
+        title, max_grade, description)
+
+def  get_all_grades(student_github):
+    """Getting all the project titles and their grades for one student."""
+    QUERY = """
+        SELECT project_title, grade FROM Grades WHERE student_github = ?
+        """
+    db_cursor.execute(QUERY,(student_github,))
+    rows = db_cursor.fetchall()
+    for row in rows :
+        print "Project: %s / Grade: %s" %(row[0], row[1])
+
 
 def handle_input():
     """Main loop.
@@ -112,6 +132,17 @@ def handle_input():
         elif command == "give_grade":
             github, title, grade = args
             assign_grade(github, title, grade)
+
+        elif command == "new_project":
+            title = args[0]
+            max_grade = int(args[1])
+            description = " ".join(args[2:])
+            make_new_project(title, max_grade, description)
+
+        elif command == "get_grades":
+            student_github = args[0]
+            get_all_grades(student_github)
+
 
 
 
